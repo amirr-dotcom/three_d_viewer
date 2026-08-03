@@ -8,6 +8,8 @@ A high-performance Flutter package for viewing 3D models (GLB/GLTF) with support
 *   **Animation Control**: Play, pause, and scrub through specific animation layers.
 *   **Intuitive Camera**: Supports orbit controls with customizable limits (vertical/horizontal angles).
 *   **Zoom Configuration**: Set initial zoom levels and define min/max zoom constraints.
+*   **Auto-Centering**: Automatically center models at the origin for consistent viewing.
+*   **Debug Helpers**: Toggle axes and grid helpers for development and positioning.
 *   **Custom Loader**: Add your own Flutter widget as a loading indicator while the model loads.
 *   **Background Transparency**: Support for transparent or custom-colored backgrounds.
 *   **Local & Remote Assets**: Load models from Flutter assets or remote URLs.
@@ -18,7 +20,7 @@ Add `three_d_viewer` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  three_d_viewer: ^0.0.1
+  three_d_viewer: ^0.0.2
 ```
 
 ### Platform Setup
@@ -51,11 +53,14 @@ ThreeDViewer(
   controller: _controller,
   assetPath: 'assets/models/my_model.glb',
   backgroundColor: Colors.transparent,
+  autoCenter: true,
+  showDebugHelpers: false,
   zoomConfig: ThreeDZoomConfig(
     initialZoom: 1.0,
     minZoom: 0.5,
     maxZoom: 2.0,
   ),
+  initialTargetPosition: [0, 1.0, 0], // Look at y=1.0
   onAnimationsLoaded: (animations) {
     print("Loaded ${animations.length} animations");
   },

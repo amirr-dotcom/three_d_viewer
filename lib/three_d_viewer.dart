@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
@@ -29,6 +30,12 @@ class ThreeDRotationLimits {
     this.minHorizontalAngle,
     this.maxHorizontalAngle,
   });
+
+  double? _toRad(double? deg) => deg != null ? deg * (math.pi / 180.0) : null;
+  double? get minVerticalRad => _toRad(minVerticalAngle);
+  double? get maxVerticalRad => _toRad(maxVerticalAngle);
+  double? get minHorizontalRad => _toRad(minHorizontalAngle);
+  double? get maxHorizontalRad => _toRad(maxHorizontalAngle);
 }
 
 class ThreeDZoomConfig {
@@ -49,10 +56,7 @@ class ThreeDZoomConfig {
     this.minZoom,
     this.maxZoom,
     this.enableZoom = true,
-  }) : assert(
-            (minZoom == null || initialZoom >= minZoom) &&
-                (maxZoom == null || initialZoom <= maxZoom),
-            'initialZoom ($initialZoom) must be between minZoom ($minZoom) and maxZoom ($maxZoom)');
+  });
 }
 
 class ThreeDViewerController {
@@ -68,9 +72,16 @@ class ThreeDViewer extends StatefulWidget {
   final bool enableRotate;
   final bool enablePan;
   final bool enableBoundaries;
+  final bool showDebugHelpers;
+  final bool autoCenter;
   final ThreeDRotationLimits? rotationLimits;
+
+  /// [HorizontalAngle (0-360), VerticalAngle (0-180), Distance (0 for Auto)]
   final List<double>? initialCameraPosition;
+
+  /// [X, Y, Z] - The point the camera looks at.
   final List<double>? initialTargetPosition;
+
   final bool autoPlay;
   final ThreeDViewerController? controller;
   final Function(List<ThreeDAnimation> animations)? onAnimationsLoaded;
@@ -82,8 +93,10 @@ class ThreeDViewer extends StatefulWidget {
     this.backgroundColor = const Color(0xFFF0F0F0),
     this.zoomConfig = const ThreeDZoomConfig(),
     this.enableRotate = true,
-    this.enablePan = false,
+    this.enablePan = true,
     this.enableBoundaries = true,
+    this.showDebugHelpers = false,
+    this.autoCenter = false,
     this.rotationLimits,
     this.initialCameraPosition,
     this.initialTargetPosition,
@@ -150,6 +163,8 @@ class _ThreeDViewerState extends State<ThreeDViewer> {
       widget.rotationLimits?.maxVerticalAngle ?? "null", // 14 (Degrees)
       widget.rotationLimits?.minHorizontalAngle ?? "null", // 15 (Degrees)
       widget.rotationLimits?.maxHorizontalAngle ?? "null", // 16 (Degrees)
+      widget.showDebugHelpers,                            // 17
+      widget.autoCenter,                                  // 18
     ];
   }
 
@@ -169,7 +184,7 @@ class _ThreeDViewerState extends State<ThreeDViewer> {
             javaScriptEnabled: true,
             transparentBackground: true,
             supportZoom: false,
-            cacheEnabled: true,
+            cacheEnabled: false,
             disableContextMenu: true,
           ),
           onWebViewCreated: (controller) {
@@ -180,7 +195,9 @@ class _ThreeDViewerState extends State<ThreeDViewer> {
               await Future.delayed(const Duration(milliseconds: 200));
               if (mounted) setState(() => isLoadingModel = false);
             });
-            controller.addJavaScriptHandler(handlerName: 'onLoadError', callback: (args) => setState(() => isLoadingModel = false));
+            controller.addJavaScriptHandler(handlerName: 'onLoadError', callback: (args) {
+              if (mounted) setState(() => isLoadingModel = false);
+            });
             controller.addJavaScriptHandler(handlerName: 'onAnimationsLoaded', callback: (args) {
               final List<dynamic> anims = args[0] as List<dynamic>;
               widget.onAnimationsLoaded?.call(anims.map((e) => ThreeDAnimation.fromMap(e as Map)).toList());
