@@ -1,9 +1,8 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-export 'package:flutter_inappwebview/flutter_inappwebview.dart' show InAppLocalhostServer;
 
 class ThreeDAnimation {
   final String name;
@@ -181,6 +180,10 @@ class _ThreeDViewerState extends State<ThreeDViewer> {
   }
 
   Future<void> _startServer() async {
+    if (kIsWeb) {
+      if (mounted) setState(() => isServerRunning = true);
+      return;
+    }
     if (_localhostServer == null) {
       _localhostServer = InAppLocalhostServer(port: 8080);
       await _localhostServer!.start();
@@ -206,7 +209,12 @@ class _ThreeDViewerState extends State<ThreeDViewer> {
     String path = widget.assetPath;
     if (!path.startsWith('http')) {
       if (!path.startsWith('/')) path = "/$path";
-      path = "http://127.0.0.1:8080$path";
+      if (kIsWeb) {
+        // Use relative path for web assets to ensure they load from the same domain
+        path = "assets$path";
+      } else {
+        path = "http://127.0.0.1:8080$path";
+      }
     }
     String hex = widget.backgroundColor == Colors.transparent ? 'transparent' : '#${widget.backgroundColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
     double initialSpeed = widget.autoRotateConfig.clockwise ? widget.autoRotateConfig.speed : -widget.autoRotateConfig.speed;
@@ -242,8 +250,11 @@ class _ThreeDViewerState extends State<ThreeDViewer> {
   @override
   Widget build(BuildContext context) {
     if (!isServerRunning) return const Center(child: CircularProgressIndicator());
-    // Note: Assets in packages are accessed via 'packages/package_name/assets/...'
-    final String initialUrl = "http://127.0.0.1:8080/packages/three_d_viewer/assets/web_viewer/index.html";
+    
+    // On web, the path must be relative to the base URL or absolute from the same origin
+    final String initialUrl = kIsWeb 
+        ? "assets/assets/web_viewer/index.html" 
+        : "http://127.0.0.1:8080/assets/web_viewer/index.html";
 
     return Stack(
       children: [
