@@ -1,6 +1,6 @@
 name: three_d_viewer
-description: "A high-performance Flutter package for viewing 3D models (GLB/GLTF) with support for animations, camera controls, and custom textures using Three.js."
-version: 0.0.2
+description: "A high-performance Flutter package for viewing 3D models (GLB/GLTF) with support for animations, camera controls, custom textures, and AR using Three.js."
+version: 0.1.0
 homepage: https://github.com/amirr-dotcom/three_d_viewer
 repository: https://github.com/amirr-dotcom/three_d_viewer
 issue_tracker: https://github.com/amirr-dotcom/three_d_viewer/issues
@@ -13,6 +13,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_inappwebview: ^6.1.5
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:

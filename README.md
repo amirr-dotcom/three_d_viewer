@@ -1,15 +1,18 @@
 # ThreeDViewer
 
-A high-performance Flutter package for viewing 3D models (GLB/GLTF) with support for animations, camera controls, and custom textures using Three.js and InAppWebView.
+A high-performance Flutter package for viewing 3D models (GLB/GLTF) with support for animations, camera controls, custom textures, and AR using Three.js and InAppWebView.
 
 ## Features
 
 *   **GLB/GLTF Support**: Render high-quality 3D models seamlessly.
+*   **Integrated AR**: Launch models in Augmented Reality (Scene Viewer on Android, Quick Look on iOS).
 *   **Animation Control**: Play, pause, and scrub through specific animation layers.
-*   **Intuitive Camera**: Supports orbit controls with customizable limits (vertical/horizontal angles).
+*   **Interactive Hotspots**: Add clickable HTML-based hotspots that track points on the model.
+*   **Auto-Rotate**: Customizable auto-rotation with controllable speed and direction.
+*   **Intuitive Camera**: Supports orbit controls with customizable limits (up, down, left, right).
 *   **Zoom Configuration**: Set initial zoom levels and define min/max zoom constraints.
 *   **Auto-Centering**: Automatically center models at the origin for consistent viewing.
-*   **Debug Helpers**: Toggle axes and grid helpers for development and positioning.
+*   **Debug Helpers**: Toggle grid, axes, and target markers for development and positioning.
 *   **Custom Loader**: Add your own Flutter widget as a loading indicator while the model loads.
 *   **Background Transparency**: Support for transparent or custom-colored backgrounds.
 *   **Local & Remote Assets**: Load models from Flutter assets or remote URLs.
@@ -20,7 +23,7 @@ Add `three_d_viewer` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  three_d_viewer: ^0.0.2
+  three_d_viewer: ^0.1.0
 ```
 
 ### Platform Setup
@@ -30,6 +33,14 @@ Ensure your `minSdkVersion` is at least **21** in `android/app/build.gradle`.
 
 #### iOS
 Ensure your `Deployment Target` is at least **12.0**.
+To use AR features, add the following to your `Info.plist`:
+```xml
+<key>LSApplicationQueriesSchemes</key>
+<array>
+  <string>https</string>
+  <string>http</string>
+</array>
+```
 
 ## Usage
 
@@ -54,21 +65,33 @@ ThreeDViewer(
   assetPath: 'assets/models/my_model.glb',
   backgroundColor: Colors.transparent,
   autoCenter: true,
-  showDebugHelpers: false,
-  zoomConfig: ThreeDZoomConfig(
-    initialZoom: 1.0,
-    minZoom: 0.5,
-    maxZoom: 2.0,
+  autoRotateConfig: ThreeDAutoRotateConfig(
+    autoRotate: true,
+    speed: 5.0,
   ),
-  initialTargetPosition: [0, 1.0, 0], // Look at y=1.0
+  debugConfig: ThreeDDebugConfig(
+    showGrid: true,
+    showAxes: true,
+  ),
+  hotspots: [
+    ThreeDHotspot(
+      id: 'h1',
+      position: [0, 1.5, 0],
+      label: 'Head',
+      color: Colors.red,
+    ),
+  ],
+  onHotspotTapped: (id) => print("Tapped hotspot: $id"),
   onAnimationsLoaded: (animations) {
     print("Loaded ${animations.length} animations");
   },
 )
 
-// Control animations
+// Control the viewer
 _controller.toggleAnimation(true);
-_controller.setAnimationProgress('Walk', 0.5);
+_controller.setMaterialColor('Body_Mesh', Colors.blue);
+_controller.goToView(180, 90, 5.0); // Yaw, Pitch, Distance
+_controller.launchAR();
 ```
 
 ## Additional information

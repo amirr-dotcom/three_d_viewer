@@ -1,3 +1,15 @@
+## 0.1.0
+
+* **AR Support**: Added `launchAR()` method to view models in Augmented Reality on iOS and Android.
+* **Hotspots**: Introduced `ThreeDHotspot` for interactive, tracking markers on 3D models with click callbacks.
+* **Auto-Rotate**: Added `ThreeDAutoRotateConfig` to control model rotation automatically.
+* **Dynamic Material Control**: Added `setMaterialColor()` to change mesh colors at runtime.
+* **View Navigation**: Added `goToView()` to animate the camera to specific angles and distances.
+* **Advanced Debugging**: Replaced `showDebugHelpers` with a more granular `ThreeDDebugConfig`.
+* **Improved Interaction**: Added `onObjectDoubleTapped` and optional `enableDoubleTapZoom`.
+* **Environment Control**: Added `ThreeDEnvironmentConfig` for future HDR/Environment intensity support.
+* **Bug Fixes**: Improved initial loading sequence and robust tap detection across devices.
+
 ## 0.0.2
 
 * Added `showDebugHelpers` option to display axes and grid helpers.
