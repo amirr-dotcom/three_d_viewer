@@ -242,6 +242,7 @@ class _ThreeDViewerState extends State<ThreeDViewer> {
   @override
   Widget build(BuildContext context) {
     if (!isServerRunning) return const Center(child: CircularProgressIndicator());
+    // Note: Assets in packages are accessed via 'packages/package_name/assets/...'
     final String initialUrl = "http://127.0.0.1:8080/packages/three_d_viewer/assets/web_viewer/index.html";
 
     return Stack(

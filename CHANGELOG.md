@@ -1,3 +1,9 @@
+## 0.1.1
+
+* **iOS Stability**: Improved tap detection and OrbitControls stability on iOS.
+* **JS Fixes**: Added `resetPointers` to prevent "stuck" interactions during animations or double-taps.
+* **Bug Fixes**: Adjusted tap sensitivity threshold for better responsiveness.
+
 ## 0.1.0
 
 * **AR Support**: Added `launchAR()` method to view models in Augmented Reality on iOS and Android.
